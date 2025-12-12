@@ -4,9 +4,11 @@ const App = () => {
   return (
     <div className="bg-red-400">
       <ul className="hidden md:flex gap-8 text-gray-700 font-medium">
-        <li className="hover:text-primaryColor cursor-pointer">Home</li>
+        <li className="hover:text-primaryColor cursor-pointer">CIVIRA</li>
         <li className="hover:text-primaryColor cursor-pointer">Dashboard</li>
-        <li className="hover:text-primaryColor cursor-pointer">Register</li>
+        <li className="hover:text-primaryColor cursor-pointer">
+          Register new complaint
+        </li>
         <li className="hover:text-primaryColor cursor-pointer">Login</li>
       </ul>
     </div>
