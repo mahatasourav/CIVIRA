@@ -9,7 +9,26 @@ export default {
       gridTemplateColumns: {
         auto: "repeat(auto-fill, minmax(200px, 1fr))", // Responsive grid columns
       },
+
+      /*Carousel Animation */
+      animation: {
+        scroll: "scroll 35s linear infinite",
+      },
+      keyframes: {
+        scroll: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        ".pause-animation": {
+          "animation-play-state": "paused",
+        },
+      });
+    },
+  ],
 };
