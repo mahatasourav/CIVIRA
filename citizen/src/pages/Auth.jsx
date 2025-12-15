@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "../context/AppContext";
+import { useAppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -10,40 +10,43 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const navigate = useNavigate();
+  const { login, loading, register, token, isLoggedIn, setIsLoggedIn } =
+    useAppContext();
 
   // const { token, setToken, backendurl } = useContext(AppContext);
 
   const onSubmitHandler = async (event) => {
-    // event.preventDefault();
-    // try {
-    //   if (state === "signup") {
-    //     const { data } = await axios.post(backendurl + "/api/user/register", {
-    //       name,
-    //       email,
-    //       password,
-    //     });
-    //     console.log("data", data);
-    //     if (data.success) {
-    //       localStorage.setItem("token", data.token);
-    //       setToken(data.token);
-    //     } else {
-    //       toast.error(data.message);
-    //     }
-    //   } else {
-    //     const { data } = await axios.post(backendurl + "/api/user/login", {
-    //       email,
-    //       password,
-    //     });
-    //     if (data.success) {
-    //       localStorage.setItem("token", data.token);
-    //       setToken(data.token);
-    //     } else {
-    //       toast.error(data.message);
-    //     }
-    //   }
-    // } catch (error) {
-    //   toast.error(error.message);
-    // }
+    event.preventDefault();
+    try {
+      if (state === "signup") {
+        const formData = {
+          name: name,
+          email: email,
+          password: password,
+        };
+
+        await register(formData);
+        toast.success("Registered successfully 🎉");
+        setName("");
+        setEmail("");
+        setPassword("");
+        setState("login");
+      } else {
+        const formData = {
+          email: email,
+          password: password,
+        };
+
+        await login(formData);
+        toast.success("Login successful 🚀");
+        setEmail("");
+        setPassword("");
+        setIsLoggedIn(true);
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   // useEffect(() => {
