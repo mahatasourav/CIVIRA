@@ -1,29 +1,37 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
+import { Loader2, Send, ArrowRight } from "lucide-react";
 
-import ProgressTracker from "../components/RegisterComponent/ProgressTracker";
+import ProgressBar from "../components/RegisterComponent/ProgressBar";
 import CameraOverlay from "../components/RegisterComponent/CameraOverlay";
-import CaptureStep from "../components/RegisterComponent/CaptureStep";
-import LocationStep from "../components/RegisterComponent/LocationStep";
-import DetailsStep from "../components/RegisterComponent/DetailsStep";
-import ReviewStep from "../components/RegisterComponent/ReviewStep";
 import SuccessModal from "../components/RegisterComponent/SuccessModal";
 
-// ---------- Helper ----------
+import StepEvidence from "../components/RegisterComponent/StepEvidence";
+import StepLocation from "../components/RegisterComponent/StepLocation";
+import StepDetails from "../components/RegisterComponent/StepDetails";
+import StepReview from "../components/RegisterComponent/StepReview";
+
+/* ---------- Helper Utility ---------- */
 const dataURLtoBlob = (dataurl) => {
-  const arr = dataurl.split(",");
-  const mime = arr[0].match(/:(.*?);/)[1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) u8arr[n] = bstr.charCodeAt(n);
+  if (!dataurl) return null;
+
+  const parts = dataurl.split(",");
+  if (parts.length < 2) return null;
+
+  const mime = parts[0].match(/:(.*?);/)?.[1];
+  const binary = atob(parts[1]);
+  const u8arr = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    u8arr[i] = binary.charCodeAt(i);
+  }
+
   return new Blob([u8arr], { type: mime });
 };
 
-const TOTAL_STEPS = 4;
-
 const RegisterComplaints = () => {
-  // ---------------- Core State ----------------
+  /* ---------- Global State ---------- */
   const [step, setStep] = useState(1);
+  const totalSteps = 4;
 
   const [formData, setFormData] = useState({
     ward: "",
@@ -37,324 +45,195 @@ const RegisterComplaints = () => {
   const [captures, setCaptures] = useState([]);
   const [errors, setErrors] = useState({});
 
+  /* ---------- UI State ---------- */
   const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const [isDetectingGPS, setIsDetectingGPS] = useState(false);
-  const [gpsLocked, setGpsLocked] = useState(false);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // ---------------- Camera + GPS refs ----------------
-  const videoRef = useRef(null);
-  const streamRef = useRef(null);
-
-  const locationRef = useRef({
-    lat: null,
-    lng: null,
-    accuracy: null,
-    error: null,
-  });
-
-  const watchIdRef = useRef(null);
-
-  const [currentGpsStats, setCurrentGpsStats] = useState({
-    lat: null,
-    lng: null,
-    accuracy: null,
-  });
-
-  // ---------------- Input Handler ----------------
+  /* ---------- Handlers ---------- */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
+
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
 
-  // ---------------- GPS Tracking (Camera) ----------------
-  const startLocationTracking = () => {
-    if (!navigator.geolocation) return;
+  const handleCapture = (newCapture) => {
+    const captureWithBlob = {
+      ...newCapture,
+      blob: dataURLtoBlob(newCapture.previewUrl),
+    };
 
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      (pos) => {
-        const { latitude, longitude, accuracy } = pos.coords;
-
-        locationRef.current = {
-          lat: latitude,
-          lng: longitude,
-          accuracy,
-          error: null,
-        };
-
-        setCurrentGpsStats({
-          lat: latitude,
-          lng: longitude,
-          accuracy: Math.round(accuracy),
-        });
-      },
-      (err) => {
-        locationRef.current = {
-          lat: null,
-          lng: null,
-          accuracy: null,
-          error: err.message,
-        };
-      },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 15000,
-      }
-    );
-  };
-
-  const stopLocationTracking = () => {
-    if (watchIdRef.current) {
-      navigator.geolocation.clearWatch(watchIdRef.current);
-      watchIdRef.current = null;
-    }
-  };
-
-  // ---------------- Camera ----------------
-  const startCamera = async () => {
-    if (captures.length >= 3) {
-      alert("Maximum 3 photos allowed");
-      return;
-    }
-
-    setIsCameraOpen(true);
-    startLocationTracking();
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-      });
-
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (err) {
-      alert("Unable to access camera");
-      stopLocationTracking();
-      setIsCameraOpen(false);
-    }
-  };
-
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-    }
-    stopLocationTracking();
+    setCaptures((prev) => [...prev, captureWithBlob]);
     setIsCameraOpen(false);
-  };
-
-  const capturePhoto = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d").drawImage(video, 0, 0);
-
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
-    const { lat, lng, accuracy, error } = locationRef.current;
-
-    setCaptures((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        previewUrl: dataUrl,
-        blob: dataURLtoBlob(dataUrl),
-        lat,
-        lng,
-        accuracy,
-        gpsError: error,
-      },
-    ]);
-
-    stopCamera();
   };
 
   const removePhoto = (id) => {
     setCaptures((prev) => prev.filter((c) => c.id !== id));
   };
 
-  // ---------------- Manual GPS Button ----------------
-  const handleGPS = () => {
-    setIsDetectingGPS(true);
+  /* ---------- Validation ---------- */
+  const validateStep = (currentStep) => {
+    const newErrors = {};
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
+    switch (currentStep) {
+      case 2:
+        if (!formData.ward) newErrors.ward = true;
+        if (!formData.address) newErrors.address = true;
+        break;
 
-        setFormData((prev) => ({
-          ...prev,
-          address: `Detected at ${latitude.toFixed(4)}, ${longitude.toFixed(
-            4
-          )}`,
-          ward: prev.ward || "Ward 12",
-          landmark: prev.landmark || "Near Main Road",
-        }));
+      case 3:
+        if (!formData.category) newErrors.category = true;
+        if (!formData.description) newErrors.description = true;
+        break;
 
-        setGpsLocked(true);
-        setIsDetectingGPS(false);
-      },
-      () => {
-        setIsDetectingGPS(false);
-      },
-      { enableHighAccuracy: true }
-    );
-  };
-
-  // ---------------- AUTO GPS when Step 2 opens ----------------
-  useEffect(() => {
-    if (step !== 2) return;
-    if (gpsLocked) return;
-    if (!navigator.geolocation) return;
-
-    setIsDetectingGPS(true);
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-
-        setFormData((prev) => ({
-          ...prev,
-          address: `Detected at ${latitude.toFixed(4)}, ${longitude.toFixed(
-            4
-          )}`,
-          ward: prev.ward || "Ward 12",
-          landmark: prev.landmark || "Near Main Road",
-        }));
-
-        setGpsLocked(true);
-        setIsDetectingGPS(false);
-      },
-      () => {
-        setIsDetectingGPS(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0,
-      }
-    );
-  }, [step, gpsLocked]);
-
-  // ---------------- Validation ----------------
-  const validateStep = () => {
-    const e = {};
-
-    if (step === 2) {
-      if (!formData.ward) e.ward = true;
-      if (!formData.address) e.address = true;
+      default:
+        break;
     }
 
-    if (step === 3) {
-      if (!formData.category) e.category = true;
-      if (!formData.description) e.description = true;
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return false;
     }
 
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    return true;
   };
 
-  // ---------------- Navigation ----------------
+  /* ---------- Navigation ---------- */
   const handleNext = () => {
-    if (step < TOTAL_STEPS) {
-      if (validateStep()) setStep((prev) => prev + 1);
+    if (step < totalSteps) {
+      if (validateStep(step)) {
+        setStep((prev) => prev + 1);
+      }
     } else {
-      submitToBackend();
+      handleSubmit();
     }
   };
 
-  const handleBack = () => {
-    if (step > 1) setStep((prev) => prev - 1);
-  };
+  /* ---------- Submit ---------- */
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+      console.log("Submitting:", formData, captures);
 
-  // ---------------- Submit ----------------
-  const submitToBackend = async () => {
-    setIsSubmitting(true);
-
-    const fd = new FormData();
-    Object.entries(formData).forEach(([k, v]) => fd.append(k, v));
-
-    captures.forEach((c, i) => {
-      fd.append(`evidence_${i + 1}`, c.blob, `photo_${i + 1}.jpg`);
-      fd.append(`evidence_${i + 1}_lat`, c.lat || "");
-      fd.append(`evidence_${i + 1}_lng`, c.lng || "");
-      fd.append(`evidence_${i + 1}_accuracy`, c.accuracy || "");
-    });
-
-    setTimeout(() => {
-      setIsSubmitting(false);
+      await new Promise((res) => setTimeout(res, 2000));
       setIsSuccess(true);
-    }, 2000);
+    } catch (err) {
+      console.error("Submission failed:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // ---------------- Cleanup ----------------
-  useEffect(() => {
-    return () => stopCamera();
-  }, []);
+  const resetForm = () => {
+    setStep(1);
+    setFormData({
+      ward: "",
+      landmark: "",
+      address: "",
+      category: "",
+      description: "",
+      notes: "",
+    });
+    setCaptures([]);
+    setErrors({});
+    setIsSuccess(false);
+  };
 
-  // ---------------- Render ----------------
   return (
-    <div className="min-h-screen bg-slate-50">
-      <ProgressTracker step={step} totalSteps={TOTAL_STEPS} />
-
-      <CameraOverlay
-        isOpen={isCameraOpen}
-        videoRef={videoRef}
-        gpsStats={currentGpsStats}
-        onClose={stopCamera}
-        onCapture={capturePhoto}
-      />
-
-      {step === 1 && (
-        <CaptureStep
-          captures={captures}
-          onOpenCamera={startCamera}
-          onRemovePhoto={removePhoto}
+    <div className="relative flex flex-col min-h-screen overflow-x-hidden font-sans bg-slate-50 text-slate-800">
+      {/* Camera Overlay */}
+      {isCameraOpen && (
+        <CameraOverlay
+          onCapture={handleCapture}
+          onClose={() => setIsCameraOpen(false)}
+          photoCount={captures.length}
         />
       )}
 
-      {step === 2 && (
-        <LocationStep
-          formData={formData}
-          errors={errors}
-          onChange={handleInputChange}
-          onUseGPS={handleGPS}
-          gpsLocked={gpsLocked}
-          isDetectingGPS={isDetectingGPS}
-          captures={captures}
-        />
-      )}
+      {/* Success Modal */}
+      {isSuccess && <SuccessModal onClose={resetForm} />}
 
-      {step === 3 && (
-        <DetailsStep
-          formData={formData}
-          errors={errors}
-          onChange={handleInputChange}
-        />
-      )}
+      {/* Main Content */}
+      <div className="relative z-10 w-full max-w-4xl px-6 mx-auto mt-10 mb-20">
+        <ProgressBar currentStep={step} totalSteps={totalSteps} />
 
-      {step === 4 && <ReviewStep formData={formData} captures={captures} />}
+        <div className="bg-white/70 backdrop-blur-xl border border-white shadow-xl rounded-3xl p-6 md:p-10 min-h-[450px]">
+          {step === 1 && (
+            <StepEvidence
+              captures={captures}
+              onOpenCam={() => setIsCameraOpen(true)}
+              onRemove={removePhoto}
+            />
+          )}
 
-      {/* Navigation */}
-      <div className="flex justify-between max-w-4xl px-6 py-8 mx-auto">
-        <button onClick={handleBack} disabled={step === 1 || isSubmitting}>
-          Back
-        </button>
-        <button onClick={handleNext} disabled={isSubmitting}>
-          {step === TOTAL_STEPS ? "Submit" : "Next"}
-        </button>
+          {step === 2 && (
+            <StepLocation
+              formData={formData}
+              onChange={handleInputChange}
+              errors={errors}
+              captures={captures}
+              setFormData={setFormData}
+              setErrors={setErrors}
+            />
+          )}
+
+          {step === 3 && (
+            <StepDetails
+              formData={formData}
+              onChange={handleInputChange}
+              errors={errors}
+            />
+          )}
+
+          {step === 4 && <StepReview formData={formData} captures={captures} />}
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-10">
+            <button
+              onClick={() => setStep((s) => s - 1)}
+              disabled={step === 1 || isSubmitting}
+              className={`px-8 py-3.5 rounded-xl font-bold transition-all ${
+                step === 1
+                  ? "opacity-0 pointer-events-none"
+                  : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
+              }`}
+            >
+              Back
+            </button>
+
+            <button
+              onClick={handleNext}
+              disabled={isSubmitting}
+              className={`px-8 py-3.5 rounded-xl font-bold flex items-center gap-3 shadow-lg transition-all ${
+                step === totalSteps
+                  ? "bg-emerald-500 hover:bg-emerald-600 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin" size={18} />
+                  Uploading...
+                </>
+              ) : step === totalSteps ? (
+                <>
+                  <Send size={18} />
+                  Submit Report
+                </>
+              ) : (
+                <>
+                  <ArrowRight size={18} />
+                  Next Step
+                </>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
-
-      <SuccessModal isOpen={isSuccess} />
     </div>
   );
 };
