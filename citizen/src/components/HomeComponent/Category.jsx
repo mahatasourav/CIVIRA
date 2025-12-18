@@ -5,7 +5,7 @@ export const Category = () => {
   return (
     <div className="py-12 ">
       {/* Heading */}
-      <h1 className="text-3xl text-blue-700 font-bold text-center mb-10">
+      <h1 className="text-3xl text-blue-700 uppercase font-bold text-center mb-10">
         Categories We Solve
       </h1>
 

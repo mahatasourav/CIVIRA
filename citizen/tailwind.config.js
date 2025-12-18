@@ -12,7 +12,7 @@ export default {
 
       /*Carousel Animation */
       animation: {
-        scroll: "scroll 35s linear infinite",
+        scroll: "scroll 45s linear infinite",
       },
       keyframes: {
         scroll: {

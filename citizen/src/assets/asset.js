@@ -24,7 +24,7 @@ export const assets = {
 // Category We Solve Data
 export const categories = [
   {id:1, image: category_garbage, title: "Garbage Cleaning"},
-  {id:2, image: category_pathole, title: "Pathole"},
+  {id:2, image: category_pathole, title: "Pothole"},
   {id:3, image: category_streetlight, title: "Streetlight"}
 ]
 
