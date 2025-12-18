@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./routes/protectedRoute";
 import NotFound from "./pages/NotFounPage";
+import Notifications from "./pages/Notifications";
 
 const App = () => {
   return (
@@ -51,6 +52,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <ComplaintDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
             </ProtectedRoute>
           }
         />
