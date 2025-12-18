@@ -123,14 +123,14 @@ const StepLocation = ({
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-right-8 duration-500">
-      <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-6">
+    <div className="duration-500 animate-in fade-in slide-in-from-right-8">
+      <h2 className="mb-6 text-2xl font-bold md:text-3xl text-slate-800">
         Location Data
       </h2>
 
       {/* Helper Message: Photo Auto-detection */}
       {captures.some((c) => c.lat) && (
-        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-start gap-3">
+        <div className="flex items-start gap-3 p-4 mb-6 border bg-emerald-50 border-emerald-100 rounded-xl">
           <Check className="text-emerald-600 mt-0.5 shrink-0" size={18} />
           <p className="text-sm text-emerald-800">
             Coordinates detected from your photos. Click below to fetch the
@@ -155,7 +155,7 @@ const StepLocation = ({
         >
           {isDetecting ? (
             <>
-              <Loader2 className="animate-spin text-blue-600" size={18} />
+              <Loader2 className="text-blue-600 animate-spin" size={18} />
               <span className="text-blue-600">Fetching Address...</span>
             </>
           ) : gpsLocked ? (
@@ -179,7 +179,7 @@ const StepLocation = ({
       </div>
 
       {/* Form Fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2">
         <div className="relative group">
           <input
             name="ward"
@@ -191,7 +191,7 @@ const StepLocation = ({
             }`}
           />
           {/* Tooltip for Ward */}
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+          <span className="absolute -translate-y-1/2 pointer-events-none right-4 top-1/2 text-slate-400">
             <MapPin size={18} />
           </span>
         </div>
@@ -202,7 +202,7 @@ const StepLocation = ({
             value={formData.landmark}
             onChange={onChange}
             placeholder="Nearest Landmark"
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 outline-none focus:bg-white focus:border-blue-500 transition-all"
+            className="w-full p-4 transition-all border outline-none bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-blue-500"
           />
         </div>
       </div>

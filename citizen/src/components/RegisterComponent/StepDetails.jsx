@@ -2,8 +2,8 @@ import React from "react";
 
 const StepDetails = ({ formData, onChange, errors }) => {
   return (
-    <div className="animate-in fade-in slide-in-from-right-8 duration-500">
-      <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-6">
+    <div className="duration-500 animate-in fade-in slide-in-from-right-8">
+      <h2 className="mb-6 text-2xl font-bold md:text-3xl text-slate-800">
         Issue Specifics
       </h2>
       <div className="flex flex-col gap-6">
@@ -38,7 +38,7 @@ const StepDetails = ({ formData, onChange, errors }) => {
           value={formData.notes}
           onChange={onChange}
           placeholder="Additional Notes"
-          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 h-32 resize-none outline-none focus:border-blue-500"
+          className="w-full h-32 p-4 border outline-none resize-none bg-slate-50 border-slate-200 rounded-xl focus:border-blue-500"
         ></textarea>
       </div>
     </div>
