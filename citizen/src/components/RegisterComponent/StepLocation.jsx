@@ -1,17 +1,20 @@
 import React, { useState } from "react";
 import { Check, Crosshair, Loader2, MapPin, AlertCircle } from "lucide-react";
+import { ReceiptIndianRupee } from "lucide-react";
+import { useRegisterComplaintContext } from "../../context/RegisterComplaintContext";
 
 const StepLocation = ({
-  formData,
   onChange,
   errors,
   captures,
-  setFormData,
+
   setErrors,
 }) => {
   const [gpsLocked, setGpsLocked] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectError, setDetectError] = useState(null);
+
+  const { formData, setFormData } = useRegisterComplaintContext();
 
   // --- 1. Real Reverse Geocoding Function ---
   const fetchAddressFromCoords = async (lat, lng) => {
