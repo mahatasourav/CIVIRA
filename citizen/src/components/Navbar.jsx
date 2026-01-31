@@ -11,13 +11,15 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { RxCrossCircled } from "react-icons/rx";
 import { useAppContext } from "../context/AppContext.jsx";
 import { toast } from "react-toastify";
-
+import { FaClipboardList } from "react-icons/fa";
 const Navbar = () => {
   // TEMP: replace later with auth state (context / redux)
 
   const [openProfile, setOpenProfile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isLoggedIn, setIsLoggedIn, logout } = useAppContext();
+  const { isLoggedIn, setIsLoggedIn, logout, userData, setUserData } =
+    useAppContext();
+
   const navigate = useNavigate();
 
   const navLinkClass = ({ isActive }) =>
@@ -66,6 +68,19 @@ const Navbar = () => {
               </NavLink>
             </li>
           )}
+
+          {isLoggedIn && (
+            <li>
+              <NavLink
+                to="/my-complaints"
+                className={navLinkClass}
+                onClick={() => setOpenProfile(false)}
+              >
+                <FaClipboardList />
+                My Complaints
+              </NavLink>
+            </li>
+          )}
         </ul>
 
         {/* Auth Section */}
@@ -77,7 +92,16 @@ const Navbar = () => {
                 onClick={() => setOpenProfile(!openProfile)}
                 className="text-white hover:text-blue-100 font-medium flex items-center gap-1 justify-center"
               >
-                <CgProfile size={32} />
+                {userData ? (
+                  <img
+                    className="w-8 h-8 rounded-full object-cover"
+                    src={userData.image}
+                    alt=""
+                    srcset=""
+                  />
+                ) : (
+                  <CgProfile size={32} />
+                )}
               </button>
 
               {/* Profile Dropdown */}
@@ -89,14 +113,6 @@ const Navbar = () => {
                     onClick={() => setOpenProfile(false)}
                   >
                     Your Profile
-                  </NavLink>
-
-                  <NavLink
-                    to="/my-complaints"
-                    className="block px-4 py-2 text-gray-700 hover:bg-blue-50"
-                    onClick={() => setOpenProfile(false)}
-                  >
-                    Your Complaints
                   </NavLink>
 
                   <hr />
@@ -162,7 +178,18 @@ const Navbar = () => {
               <>
                 <NavLink to="/profile">Your Profile</NavLink>
                 <NavLink to="/my-complaints">Your Complaints</NavLink>
-                <button className="text-left text-red-200">Logout</button>
+                <button
+                  className="text-left text-red-200"
+                  onClick={() => {
+                    setOpenProfile(false);
+                    setIsLoggedIn(false);
+                    logout();
+                    navigate("/auth");
+                    toast.success("Logged out successfully");
+                  }}
+                >
+                  Logout
+                </button>
               </>
             ) : (
               <NavLink to="/auth">Login</NavLink>
