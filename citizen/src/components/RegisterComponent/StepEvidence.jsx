@@ -5,12 +5,14 @@ import { GrValidate } from "react-icons/gr";
 import { RiRobot2Fill } from "react-icons/ri";
 
 const StepEvidence = ({ captures, onOpenCam, onRemove }) => {
-  const { validImages, setValidImages } = useRegisterComplaintContext();
+  const { validImages, setValidImages, isLoading, setIsLoading } =
+    useRegisterComplaintContext();
+
   return (
     <div className="animate-in fade-in slide-in-from-right-8 duration-500">
       {validImages ? (
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-8">
-          Image verified By AI <RiRobot2Fill className="inline-block" />
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-8 flex items-center gap-2">
+          Image verified By AI <RiRobot2Fill />
         </h2>
       ) : (
         <>
@@ -47,7 +49,9 @@ const StepEvidence = ({ captures, onOpenCam, onRemove }) => {
         {captures.length < 3 ? (
           <h3 className="text-slate-900 font-bold text-lg mb-1">
             {validImages ? (
-              <span className="text-green-700">Photos validated !! </span>
+              <span className="text-green-700">
+                Photos validated successfully !!{" "}
+              </span>
             ) : (
               <span>Add Photos</span>
             )}

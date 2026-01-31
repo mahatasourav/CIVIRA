@@ -16,6 +16,7 @@ export const AppProvider2 = ({ children }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [validImages, setValidImages] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   /* ---------- Global State ---------- */
 
@@ -45,7 +46,30 @@ export const AppProvider2 = ({ children }) => {
     return config;
   });
 
-  // handel image validation
+  // 🔥 Global Loading Start
+  api.interceptors.request.use(
+    (config) => {
+      setIsLoading(true);
+      return config;
+    },
+    (error) => {
+      setIsLoading(false);
+      return Promise.reject(error);
+    },
+  );
+
+  // 🔥 Global Loading End
+  api.interceptors.response.use(
+    (response) => {
+      setIsLoading(false);
+      return response;
+    },
+    (error) => {
+      setIsLoading(false);
+      return Promise.reject(error);
+    },
+  );
+  // handel image validation api call function
 
   const handelImageValidation = async () => {
     try {
@@ -172,6 +196,9 @@ export const AppProvider2 = ({ children }) => {
         isSuccess,
         setIsSuccess,
         handleNext,
+
+        isLoading,
+        setIsLoading,
       }}
     >
       {children}

@@ -9,6 +9,7 @@ import StepDetails from "../components/RegisterComponent/StepDetails";
 import StepReview from "../components/RegisterComponent/StepReview";
 import { GrValidate } from "react-icons/gr";
 import { useRegisterComplaintContext } from "../context/RegisterComplaintContext";
+import FullScreenLoader from "../components/FullScreeenLoader";
 
 /* ---------- Helper Utility ---------- */
 const dataURLtoBlob = (dataurl) => {
@@ -54,6 +55,8 @@ const RegisterComplaints = () => {
     setIsSuccess,
     validImages,
     setValidImages,
+    isLoading,
+    setIsLoading,
   } = useRegisterComplaintContext();
 
   // useState hooks can be added here ...
@@ -113,7 +116,9 @@ const RegisterComplaints = () => {
           photoCount={captures.length}
         />
       )}
-
+      {isLoading && (
+        <FullScreenLoader show={isLoading} title={"Validating Images..."} />
+      )}
       {/* Success Modal */}
       {isSuccess && <SuccessModal onClose={resetForm} />}
 
