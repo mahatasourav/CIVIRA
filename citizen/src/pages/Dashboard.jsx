@@ -7,54 +7,7 @@ import {
   AlertCircle,
   ArrowRight,
 } from "lucide-react";
-
-const stats = [
-  {
-    label: "Total Complaints",
-    value: 24,
-    icon: <FileText size={18} />,
-    color: "bg-blue-600",
-  },
-  {
-    label: "In Progress",
-    value: 6,
-    icon: <Clock size={18} />,
-    color: "bg-amber-500",
-  },
-  {
-    label: "Resolved",
-    value: 14,
-    icon: <CheckCircle2 size={18} />,
-    color: "bg-emerald-500",
-  },
-  {
-    label: "Pending",
-    value: 4,
-    icon: <AlertCircle size={18} />,
-    color: "bg-red-500",
-  },
-];
-
-const recentComplaints = [
-  {
-    id: "1033",
-    title: "Garbage Overflow",
-    status: "In Progress",
-    date: "12 Jan 2025",
-  },
-  {
-    id: "1031",
-    title: "Pothole",
-    status: "Pending",
-    date: "10 Jan 2025",
-  },
-  {
-    id: "1029",
-    title: "Streetlight Failure",
-    status: "Resolved",
-    date: "08 Jan 2025",
-  },
-];
+import { useAppContext } from "../context/AppContext";
 
 const statusStyles = {
   "In Progress": "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
@@ -64,6 +17,35 @@ const statusStyles = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { setComplaintsData, complaintsData, stats, recentComplaints } =
+    useAppContext();
+
+  const statistics = [
+    {
+      label: "Total Complaints",
+      value: complaintsData.length,
+      icon: <FileText size={18} />,
+      color: "bg-blue-600",
+    },
+    {
+      label: "Registered",
+      value: stats.registered,
+      icon: <Clock size={18} />,
+      color: "bg-amber-500",
+    },
+    {
+      label: "Resolved",
+      value: stats.resolved,
+      icon: <CheckCircle2 size={18} />,
+      color: "bg-emerald-500",
+    },
+    {
+      label: "Rejected",
+      value: stats.rejected,
+      icon: <AlertCircle size={18} />,
+      color: "bg-red-500",
+    },
+  ];
 
   return (
     <div className="min-h-screen p-4 bg-slate-50 md:p-8">
@@ -72,6 +54,7 @@ export default function Dashboard() {
         <header>
           <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl text-slate-900">
             Dashboard
+            {console.log("Statistics", stats)}
           </h1>
           <p className="mt-2 text-sm font-medium text-slate-500">
             Track the status and progress of your submitted complaints.
@@ -80,7 +63,7 @@ export default function Dashboard() {
 
         {/* Compact Stats Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
+          {statistics.map((stat) => (
             <div
               key={stat.label}
               className="p-4 bg-white border border-slate-200 rounded-xl transition-all hover:shadow-md hover:-translate-y-0.5"
@@ -145,7 +128,8 @@ export default function Dashboard() {
 
             <div className="px-5 py-3 text-center bg-slate-50/60">
               <p className="text-xs font-medium text-slate-400">
-                Showing {recentComplaints.length} of {stats[0].value} complaints
+                Showing {recentComplaints.length} of {complaintsData.length}{" "}
+                complaints
               </p>
             </div>
           </div>

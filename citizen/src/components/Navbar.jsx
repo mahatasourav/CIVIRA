@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "../assets/asset.js";
 import { FaRegPlusSquare, FaClipboardList } from "react-icons/fa";
-import { IoMdNotifications } from "react-icons/io";
+import { IoIosHome, IoMdLogOut, IoMdNotifications } from "react-icons/io";
 import { RxDashboard, RxCrossCircled } from "react-icons/rx";
 import { CgProfile } from "react-icons/cg";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -42,6 +42,9 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <ul className="items-center hidden gap-8 md:flex">
+            <NavLink to="/" className={navLinkClass}>
+              <IoIosHome /> Home
+            </NavLink>
             <NavLink to="/dashboard" className={navLinkClass}>
               <RxDashboard /> Dashboard
             </NavLink>
@@ -86,16 +89,17 @@ const Navbar = () => {
                   <div className="absolute right-0 w-48 mt-3 bg-white rounded-lg shadow-lg">
                     <NavLink
                       to="/profile"
-                      className="block px-4 py-2 hover:bg-blue-50"
+                      className=" px-4 py-2 hover:bg-blue-50 flex gap-2 items-center"
                       onClick={() => setOpenProfile(false)}
                     >
+                      <CgProfile />
                       Your Profile
                     </NavLink>
 
                     <hr />
 
                     <button
-                      className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50"
+                      className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 flex gap-2 items-center"
                       onClick={() => {
                         setOpenProfile(false);
                         setIsLoggedIn(false);
@@ -104,6 +108,7 @@ const Navbar = () => {
                         toast.success("Logged out successfully");
                       }}
                     >
+                      <IoMdLogOut />
                       Logout
                     </button>
                   </div>
@@ -164,6 +169,9 @@ const Navbar = () => {
 
         {/* Menu Items */}
         <ul className="flex flex-col gap-5 px-6 py-6 text-white">
+          <NavLink to="/" onClick={() => setMobileMenuOpen(false)}>
+            <IoIosHome className="inline mr-3" /> Home
+          </NavLink>
           <NavLink to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
             <RxDashboard className="inline mr-3" /> Dashboard
           </NavLink>

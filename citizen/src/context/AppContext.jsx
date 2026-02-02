@@ -17,6 +17,13 @@ export const AppProvider = ({ children }) => {
 
   const [userData, setUserData] = useState(false);
   const [complaintsData, setComplaintsData] = useState([]);
+  const [stats, setStats] = useState({
+    registered: 1,
+    resolved: 0,
+    pending: 0,
+    rejected: 0,
+  });
+  const [recentComplaints, setRecentComplaints] = useState([]);
   const [complaintDetails, setComplaintDetails] = useState([]);
   const [evidence, setEvidence] = useState([]);
 
@@ -141,6 +148,48 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // const calCulateComplaintsData = () => {};
+  useEffect(() => {
+    console.log("Calculating complaints data");
+    let registered = 0;
+    let resolved = 0;
+    let pending = 0;
+    let rejected = 0;
+
+    for (let i = 0; i < complaintsData.length; i++) {
+      if (complaintsData[i].complaint_status === "Registered") registered++;
+      else if (complaintsData[i].complaint_status === "Resolved") resolved++;
+      else if (complaintsData[i].complaint_status === "Pending") pending++;
+      else rejected++;
+    }
+    console.log("Calculating complaints data........................");
+
+    console.log("Registered:", complaintsData.length);
+
+    setStats({ registered, resolved, pending, rejected });
+  }, [complaintsData]);
+
+  useEffect(() => {
+    if (complaintsData.length > 0) {
+      const recents = complaintsData
+        .slice()
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 3)
+        .map((item) => ({
+          id: item._id,
+          title: item.category,
+          status: item.complaint_status,
+          date: new Date(item.createdAt).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }),
+        }));
+
+      setRecentComplaints(recents);
+    }
+  }, [complaintsData]);
+
   // When token chnages, update isLoggedIn
   useEffect(() => {
     setIsLoggedIn(!!token);
@@ -176,6 +225,8 @@ export const AppProvider = ({ children }) => {
         setComplaintDetails,
         evidence,
         setEvidence,
+        stats,
+        recentComplaints,
       }}
     >
       {children}
