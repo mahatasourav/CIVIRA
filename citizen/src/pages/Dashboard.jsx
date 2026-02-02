@@ -1,51 +1,22 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FileText,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  ArrowRight,
-} from "lucide-react";
-import { useAppContext } from "../context/AppContext";
+// import {
+//   FileText,
+//   Clock,
+//   CheckCircle2,
+//   AlertCircle,
+//   ArrowRight,
+// } from "lucide-react";
+// import { useAppContext } from "../context/AppContext";
 
-const statusStyles = {
-  "In Progress": "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
-  Pending: "bg-red-100 text-red-700 ring-1 ring-red-200",
-  Resolved: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
-};
+// const statusStyles = {
+//   "In Progress": "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
+//   Pending: "bg-red-100 text-red-700 ring-1 ring-red-200",
+//   Resolved: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
+// };
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { setComplaintsData, complaintsData, stats, recentComplaints } =
-    useAppContext();
-
-  const statistics = [
-    {
-      label: "Total Complaints",
-      value: complaintsData.length,
-      icon: <FileText size={18} />,
-      color: "bg-blue-600",
-    },
-    {
-      label: "Registered",
-      value: stats.registered,
-      icon: <Clock size={18} />,
-      color: "bg-amber-500",
-    },
-    {
-      label: "Resolved",
-      value: stats.resolved,
-      icon: <CheckCircle2 size={18} />,
-      color: "bg-emerald-500",
-    },
-    {
-      label: "Rejected",
-      value: stats.rejected,
-      icon: <AlertCircle size={18} />,
-      color: "bg-red-500",
-    },
-  ];
 
   return (
     <div className="min-h-screen p-4 bg-slate-50 md:p-8">
@@ -53,16 +24,15 @@ export default function Dashboard() {
         {/* Header */}
         <header>
           <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl text-slate-900">
-            Dashboard
-            {console.log("Statistics", stats)}
+            Public Dashboard
           </h1>
           <p className="mt-2 text-sm font-medium text-slate-500">
-            Track the status and progress of your submitted complaints.
+            Track the status and progress of submitted complaints.
           </p>
         </header>
 
         {/* Compact Stats Cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {statistics.map((stat) => (
             <div
               key={stat.label}
@@ -82,12 +52,12 @@ export default function Dashboard() {
               </p>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* Recent Complaints */}
-        <div className="relative">
-          {/* Subtle glow */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-100 to-slate-100 rounded-2xl blur opacity-30" />
+        {/* <div className="relative"> */}
+        {/* Subtle glow */}
+        {/* <div className="absolute -inset-1 bg-gradient-to-r from-blue-100 to-slate-100 rounded-2xl blur opacity-30" />
 
           <div className="relative overflow-hidden bg-white border border-slate-200 rounded-2xl">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
@@ -133,7 +103,7 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  FileText,
+  AlertCircle,
   Trash2,
   Route,
   Lightbulb,
@@ -15,8 +17,13 @@ import {
 import { useAppContext } from "../context/AppContext";
 
 const MyComplaints = () => {
-  const { setComplaintsData, complaintsData, handleComplaintDetails } =
-    useAppContext();
+  const {
+    setComplaintsData,
+    complaintsData,
+    handleComplaintDetails,
+    stats,
+    recentComplaints,
+  } = useAppContext();
 
   const navigate = useNavigate();
 
@@ -62,6 +69,33 @@ const MyComplaints = () => {
     Success: "bg-emerald-600 text-white",
   };
 
+  const statistics = [
+    {
+      label: "Total Complaints",
+      value: complaintsData.length,
+      icon: <FileText size={18} />,
+      color: "bg-blue-600",
+    },
+    {
+      label: "Registered",
+      value: stats.registered,
+      icon: <Clock size={18} />,
+      color: "bg-amber-500",
+    },
+    {
+      label: "Resolved",
+      value: stats.resolved,
+      icon: <CheckCircle2 size={18} />,
+      color: "bg-emerald-500",
+    },
+    {
+      label: "Rejected",
+      value: stats.rejected,
+      icon: <AlertCircle size={18} />,
+      color: "bg-red-500",
+    },
+  ];
+
   return (
     <div className="min-h-screen p-6 bg-slate-50 text-slate-900">
       <main className="max-w-6xl py-10 mx-auto">
@@ -75,6 +109,29 @@ const MyComplaints = () => {
             View and track the status of your reported issues
           </p>
         </header>
+
+        {/* Compact Stats Cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          {statistics.map((stat) => (
+            <div
+              key={stat.label}
+              className="p-4 bg-white border border-slate-200 rounded-xl transition-all hover:shadow-md hover:-translate-y-0.5"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`p-2.5 rounded-lg text-white ${stat.color}`}>
+                  {stat.icon}
+                </div>
+                <p className="text-xs font-semibold tracking-wide uppercase text-slate-500">
+                  {stat.label}
+                </p>
+              </div>
+
+              <p className="text-3xl font-black leading-none text-slate-800">
+                {stat.value}
+              </p>
+            </div>
+          ))}
+        </div>
 
         {/* Filters */}
         <div className="grid grid-cols-1 gap-4 p-5 mb-8 border border-blue-200 md:grid-cols-4 rounded-2xl bg-primary">
