@@ -25,37 +25,36 @@ const Navbar = () => {
 
   const navLinkClass = ({ isActive }) =>
     isActive
-      ? "text-blue-200 font-semibold flex items-center gap-1"
-      : "text-white hover:text-blue-100 transition flex items-center gap-1";
+      ? "text-white bg-white/15 font-semibold flex items-center gap-2 px-3 py-2 rounded-full"
+      : "text-white/90 hover:text-white hover:bg-white/10 transition flex items-center gap-2 px-3 py-2 rounded-full";
 
   return (
     <>
       {/* Navbar */}
-      <nav className="bg-[#007EC5] px-6 py-4 shadow-md sticky top-0 z-50">
-        <div className="flex items-center justify-between">
+      <nav className="bg-gradient-to-r from-[#0069a8] via-[#007EC5] to-[#0a88d6] px-4 md:px-6 py-4 shadow-md sticky top-0 z-50 border-b border-white/10">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <NavLink to="/" className="flex items-center gap-3">
             <img
               src={assets.logo}
               alt="CIVIRA Logo"
-              className="object-contain w-10 h-10"
+              className="object-contain w-10 h-10 bg-white/90 rounded-lg p-1"
             />
-            <NavLink to="/" className="text-2xl font-bold text-white">
-              CIVIRA
-            </NavLink>
-          </div>
+            <div className="leading-tight">
+              <p className="text-2xl font-bold text-white">CIVIRA</p>
+              <p className="text-[11px] tracking-wide text-white/80 uppercase">
+                Civic Issue Reporting
+              </p>
+            </div>
+          </NavLink>
 
           {/* Desktop Navigation */}
-          <ul className="items-center hidden gap-8 md:flex">
+          <ul className="items-center hidden gap-2 md:flex">
             <NavLink to="/" className={navLinkClass}>
               <IoIosHome /> Home
             </NavLink>
             <NavLink to="/dashboard" className={navLinkClass}>
               <RxDashboard /> Dashboard
-            </NavLink>
-
-            <NavLink to="/register-complaints" className={navLinkClass}>
-              <FaRegPlusSquare /> Register Complaint
             </NavLink>
 
             {isLoggedIn && (
@@ -72,22 +71,32 @@ const Navbar = () => {
           </ul>
 
           {/* Desktop Auth */}
-          <div className="relative hidden md:block">
+          <div className="relative hidden md:flex items-center gap-3">
+            <NavLink
+              to="/register-complaints"
+              className="bg-white text-[#007EC5] px-4 py-2 rounded-full font-semibold flex gap-2 items-center shadow-sm hover:bg-blue-50 transition"
+            >
+              <FaRegPlusSquare />
+              Report Issue
+            </NavLink>
             {isLoggedIn ? (
               <>
                 <button
                   onClick={() => setOpenProfile(!openProfile)}
-                  className="text-white"
+                  className="text-white flex items-center gap-2 bg-white/10 px-2 py-1 rounded-full hover:bg-white/15 transition"
                 >
                   {userData ? (
                     <img
                       src={userData.image}
-                      className="object-cover w-8 h-8 rounded-full"
+                      className="object-cover w-8 h-8 rounded-full ring-2 ring-white/40"
                       alt=""
                     />
                   ) : (
                     <CgProfile size={30} />
                   )}
+                  <span className="text-sm text-white/90 hidden lg:inline">
+                    {userData?.name ? userData.name.split(" ")[0] : "Profile"}
+                  </span>
                 </button>
 
                 {openProfile && (
@@ -122,7 +131,7 @@ const Navbar = () => {
             ) : (
               <NavLink
                 to="/auth"
-                className="bg-white text-[#007EC5] px-4 py-2 rounded-lg font-semibold flex gap-2 items-center"
+                className="bg-white text-[#007EC5] px-4 py-2 rounded-full font-semibold flex gap-2 items-center shadow-sm hover:bg-blue-50 transition"
               >
                 <IoMdLogIn />
                 Login
@@ -151,18 +160,23 @@ const Navbar = () => {
 
       {/* Mobile Side Drawer */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-[#007EC5] z-50
+        className={`fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-[#007EC5] to-[#045b8f] z-50
   transform transition-transform duration-300 ease-in-out
   ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         {/* Drawer Header */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-blue-400">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/20">
           <img
             src={assets.logo}
             alt="CIVIRA"
-            className="object-contain w-8 h-8 bg-white rounded"
+            className="object-contain w-9 h-9 bg-white rounded-lg p-1"
           />
-          <span className="text-xl font-bold text-white">CIVIRA</span>
+          <div className="leading-tight">
+            <p className="text-xl font-bold text-white">CIVIRA</p>
+            <p className="text-[10px] uppercase tracking-wide text-white/80">
+              Citizen Portal
+            </p>
+          </div>
 
           {/* Close button */}
           <button
@@ -174,19 +188,24 @@ const Navbar = () => {
         </div>
 
         {/* Menu Items */}
-        <ul className="flex flex-col gap-5 px-6 py-6 text-white">
+        <div className="px-6 pt-6">
+          <NavLink
+            to="/register-complaints"
+            onClick={() => setMobileMenuOpen(false)}
+            className="bg-white text-[#007EC5] px-4 py-3 rounded-xl font-semibold flex gap-2 items-center justify-center shadow-sm"
+          >
+            <FaRegPlusSquare />
+            Report an Issue
+          </NavLink>
+        </div>
+
+        {/* Menu Items */}
+        <ul className="flex flex-col gap-4 px-6 py-6 text-white">
           <NavLink to="/" onClick={() => setMobileMenuOpen(false)}>
             <IoIosHome className="inline mr-3" /> Home
           </NavLink>
           <NavLink to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
             <RxDashboard className="inline mr-3" /> Dashboard
-          </NavLink>
-
-          <NavLink
-            to="/register-complaints"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            <FaRegPlusSquare className="inline mr-3" /> Register Complaint
           </NavLink>
 
           {isLoggedIn && (
