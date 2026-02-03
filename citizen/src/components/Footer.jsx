@@ -4,15 +4,15 @@ import { IoIosCall, IoMdMail, IoMdPin } from "react-icons/io";
 const Footer = () => {
   return (
     <footer className="relative overflow-hidden bg-gradient-to-br from-[#0B7EC8] via-[#0A72B8] to-[#0A63A5] text-white">
-      <div className="absolute -top-20 -right-20 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-      <div className="absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
+      {/* <div className="absolute -top-20 -right-20 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
+      <div className="absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-white/10 blur-3xl" /> */}
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
-        <div className="grid gap-8 md:grid-cols-[0.9fr_1fr_1fr_1fr] md:w-[78%] md:ml-auto">
+      <div className="max-w-7xl mx-auto px-16 py-10">
+        <div className="grid gap-20 md:grid-cols-[0.9fr_1fr_1fr_1fr]  ">
           {/* Brand */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 flex items-center justify-center bg-white/90 rounded-lg">
+              <div className="w-16 h-12 flex items-center justify-center bg-white/90 rounded-lg">
                 <svg viewBox="0 0 64 64" className="w-10 h-10">
                   <path
                     d="M32 2C21.5 2 13 10.4 13 20.8c0 14.2 19 41.2 19 41.2s19-27 19-41.2C51 10.4 42.5 2 32 2z"
@@ -102,7 +102,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-5 border-t border-white/20 flex flex-col md:flex-row items-center justify-between gap-4 md:w-[78%] md:ml-auto">
+        <div className="mt-8 pt-5 border-t border-white/20 flex flex-col md:flex-row items-center justify-between gap-4 ">
           <p className="text-xs text-white/70">
             � {new Date().getFullYear()} Civira. All rights reserved.
           </p>
