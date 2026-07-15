@@ -107,29 +107,6 @@ const MyComplaints = () => {
           </p>
         </header>
 
-        {/* Compact Stats Cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          {statistics.map((stat) => (
-            <div
-              key={stat.label}
-              className="p-4 bg-white border border-slate-200 rounded-xl transition-all hover:shadow-md hover:-translate-y-0.5"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`p-2.5 rounded-lg text-white ${stat.color}`}>
-                  {stat.icon}
-                </div>
-                <p className="text-xs font-semibold tracking-wide uppercase text-slate-500">
-                  {stat.label}
-                </p>
-              </div>
-
-              <p className="text-3xl font-black leading-none text-slate-800">
-                {stat.value}
-              </p>
-            </div>
-          ))}
-        </div>
-
         {/* Filters */}
         <div className="grid grid-cols-1 gap-4 p-5 mb-8 border border-blue-200 md:grid-cols-4 rounded-2xl bg-primary">
           <FilterSelect
@@ -180,6 +157,29 @@ const MyComplaints = () => {
               />
             </div>
           </div>
+        </div>
+
+        {/* Compact Stats Cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          {statistics.map((stat) => (
+            <div
+              key={stat.label}
+              className="p-4 bg-white border border-slate-200 rounded-xl transition-all hover:shadow-md hover:-translate-y-0.5"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`p-2.5 rounded-lg text-white ${stat.color}`}>
+                  {stat.icon}
+                </div>
+                <p className="text-xs font-semibold tracking-wide uppercase text-slate-500">
+                  {stat.label}
+                </p>
+              </div>
+
+              <p className="text-3xl font-black leading-none text-slate-800">
+                {stat.value}
+              </p>
+            </div>
+          ))}
         </div>
 
         {/* Complaint List */}
