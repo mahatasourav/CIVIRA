@@ -73,21 +73,39 @@ const StepLocation = ({
       const addr = data.address || {};
 
       return {
-        ward:
-          addr.neighbourhood ||
-          addr.suburb ||
-          addr.residential ||
+        state: addr.state || "",
+
+        city:
+          addr.city ||
+          addr.town ||
+          addr.municipality ||
+          addr.county ||
           addr.village ||
           "",
+
+        // Usually returns ward/locality name, not ward number
+        ward:
+          addr.city_district ||
+          addr.suburb ||
+          addr.neighbourhood ||
+          addr.residential ||
+          addr.quarter ||
+          addr.village ||
+          "",
+
         landmark: data.name || addr.amenity || addr.shop || addr.building || "",
+
         address: [
           `${addr.house_number || ""} ${addr.road || ""}`.trim(),
-          addr.city || addr.town || addr.county || "",
+          addr.city || addr.town || "",
+          addr.state || "",
+          addr.postcode || "",
         ]
           .filter(Boolean)
           .join(", "),
       };
-    } catch {
+    } catch (err) {
+      console.error(err);
       return null;
     }
   };
@@ -142,6 +160,8 @@ const StepLocation = ({
         ward: result.ward,
         landmark: result.landmark,
         address: result.address,
+        state: result.state,
+        city: result.city,
       }));
       setErrors((prev) => ({ ...prev, ward: null, address: null }));
       setLocationLocked(true);
@@ -175,6 +195,8 @@ const StepLocation = ({
       ward: "",
       landmark: "",
       address: "",
+      state: "",
+      city: "",
     }));
   };
 
@@ -241,34 +263,89 @@ const StepLocation = ({
         )}
       </div>
 
-      {/* ---------- FORM ---------- */}
-      <div className="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2">
+      {/* ---------- LOCATION ---------- */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        {/* State */}
         <div className="relative">
           <input
-            name="ward"
-            value={formData.ward}
+            type="text"
+            name="state"
+            value={formData.state}
             onChange={onChange}
-            disabled={locationLocked}
-            placeholder="Ward No / Area"
+            placeholder="State"
             className={`w-full bg-slate-50 border rounded-xl p-4 pr-12
-                        focus:ring-2 focus:ring-blue-500 outline-none ${
-                          errors.ward
-                            ? "border-red-400 bg-red-50"
-                            : "border-slate-200"
-                        }`}
+        focus:ring-2 focus:ring-blue-500 outline-none ${
+          errors.state ? "border-red-400 bg-red-50" : "border-slate-200"
+        }`}
           />
-          <span className="absolute -translate-y-1/2 right-4 top-1/2 text-slate-400">
+
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
             <MapPin size={18} />
           </span>
         </div>
 
+        {/* City */}
+        <div className="relative">
+          <input
+            type="text"
+            name="city"
+            value={formData.city}
+            onChange={onChange}
+            placeholder="City"
+            className={`w-full bg-slate-50 border rounded-xl p-4 pr-12
+        focus:ring-2 focus:ring-blue-500 outline-none ${
+          errors.city ? "border-red-400 bg-red-50" : "border-slate-200"
+        }`}
+          />
+
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+            <MapPin size={18} />
+          </span>
+        </div>
+
+        {/* Ward */}
+        <div className="relative">
+          <input
+            type="text"
+            name="ward"
+            value={formData.ward}
+            onChange={onChange}
+            placeholder="Ward No."
+            className={`w-full bg-slate-50 border rounded-xl p-4 pr-12
+        focus:ring-2 focus:ring-blue-500 outline-none ${
+          errors.ward ? "border-red-400 bg-red-50" : "border-slate-200"
+        }`}
+          />
+
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+            <MapPin size={18} />
+          </span>
+        </div>
+      </div>
+
+      {/* Ward No. */}
+      <div className="mb-6">
+        <input
+          type="number"
+          name="wardNumber"
+          value={formData.wardNumber}
+          onChange={onChange}
+          placeholder="Ward No."
+          className={`w-full bg-slate-50 border rounded-xl p-4 pr-12
+        focus:ring-2 focus:ring-blue-500 outline-none ${
+          errors.wardNumber ? "border-red-400 bg-red-50" : "border-slate-200"
+        }`}
+        />
+      </div>
+
+      {/* Landmark */}
+      <div className="mb-6">
         <input
           name="landmark"
           value={formData.landmark}
           onChange={onChange}
-          disabled={locationLocked}
-          placeholder="Nearest Landmark"
-          className="w-full p-4 border bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+          placeholder="Nearest Landmark (Optional)"
+          className="w-full p-4 border bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
 

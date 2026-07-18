@@ -1,8 +1,14 @@
+import axios from "axios";
 import { createContext, useContext, useState } from "react";
 
 const OfficerContext = createContext();
 
 export const OfficerProvider = ({ children }) => {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  const api = axios.create({
+    baseURL: API_BASE_URL,
+  });
   const [officerToken, setOfficerToken] = useState(
     localStorage.getItem("officerToken") || "",
   );
