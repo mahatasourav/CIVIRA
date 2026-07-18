@@ -39,6 +39,7 @@ import NotFound from "@/shared/NotFound";
 import VerifyOTP from "@/modules/admin/pages/VerifyOtp";
 import Complaint from "@/modules/officer/pages/Complaint";
 import OfficerProfile from "@/modules/officer/pages/OfficerProfile";
+import ComplaintDetailsOfficer from "@/modules/officer/pages/ComplaintDetailsOfficer";
 
 const App = () => {
   return (
@@ -128,6 +129,10 @@ const App = () => {
           <Route path="dashboard" element={<OfficerDashboard />} />
           <Route path="tasks" element={<Complaint />} />
           <Route path="profile" element={<OfficerProfile />} />
+          <Route
+            path="/officer/complaint/:id"
+            element={<ComplaintDetailsOfficer />}
+          />
         </Route>
 
         {/* Admin Login */}

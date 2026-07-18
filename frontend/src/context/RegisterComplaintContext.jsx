@@ -15,13 +15,14 @@ export const AppProvider2 = ({ children }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [validImages, setValidImages] = useState(false);
+  const [validImages, setValidImages] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   /* ---------- Global State ---------- */
 
   const [formData, setFormData] = useState({
     ward: "",
+    wardNumber: "",
     landmark: "",
     address: "",
     state: "",
@@ -73,8 +74,15 @@ export const AppProvider2 = ({ children }) => {
         },
       );
 
-      console.log("All images valid:", response.data);
-      setValidImages(response.data.isValid);
+      console.log(response.data);
+
+      setValidImages(response.data);
+
+      setFormData((prev) => ({
+        ...prev,
+        category: response.data.prediction,
+      }));
+
       setIsLoading(false);
 
       if (response.data.isValid) {
@@ -95,9 +103,12 @@ export const AppProvider2 = ({ children }) => {
 
     switch (currentStep) {
       case 2:
-        if (!formData.ward) newErrors.ward = true;
+        if (!formData.city) newErrors.city = true;
+        if (!formData.state) newErrors.state = true;
+        if (!formData.wardNumber) newErrors.wardNumber = true;
         if (!formData.address) newErrors.address = true;
         if (!formData.landmark) newErrors.landmark = true;
+        if (!formData.ward) newErrors.ward = true;
         break;
 
       case 3:
@@ -111,6 +122,7 @@ export const AppProvider2 = ({ children }) => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      toast.error("Please fill all required fields before proceeding.");
       return false;
     }
 
@@ -121,18 +133,15 @@ export const AppProvider2 = ({ children }) => {
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
+
       console.log("Submitting:", formData, captures);
 
       const fd = new FormData();
 
-      /* ----------------------------------
-       1️⃣ Add JSON data from formData
-    ----------------------------------- */
+      // Form data
       fd.append("data", JSON.stringify(formData));
 
-      /* ----------------------------------
-       2️⃣ Add metadata for each image
-    ----------------------------------- */
+      // Image metadata
       const metaData = captures.map((c) => ({
         lat: c.lat,
         lng: c.lng,
@@ -143,35 +152,39 @@ export const AppProvider2 = ({ children }) => {
 
       fd.append("meta", JSON.stringify(metaData));
 
-      /* ----------------------------------
-       3️⃣ Add images (Blob files)
-    ----------------------------------- */
+      // Images
       captures.forEach((item, index) => {
         fd.append("images", item.blob, `evidence_${index}.jpg`);
       });
 
-      /* ----------------------------------
-       4️⃣ API Submission
-    ----------------------------------- */
-      const response = await api.post(`/api/user/register-complaint`, fd, {
+      // API Call
+      const response = await api.post("/api/user/register-complaint", fd, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
       console.log("Response:", response.data);
-      if (response.success) {
-        toast.success(response.message);
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setIsSuccess(true);
       } else {
-        toast.error(response.error);
+        toast.error(response.data.message);
       }
-      setIsSuccess(true);
     } catch (err) {
-      console.error("Submission failed:", err);
+      console.error(err);
+
+      // Show backend message if available
+      toast.error(
+        err.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
+
   /* ---------- Navigation ---------- */
   const handleNext = () => {
     if (step === 1 && !validImages) {

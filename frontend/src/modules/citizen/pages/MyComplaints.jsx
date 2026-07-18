@@ -70,6 +70,12 @@ const MyComplaints = () => {
       icon: <Clock size={18} />,
       color: "bg-amber-500",
     },
+    // {
+    //   label: "In Progress",
+    //   value: stats.inProgress,
+    //   icon: <Lightbulb size={18} />,
+    //   color: "bg-blue-500",
+    // },
     {
       label: "Resolved",
       value: stats.resolved,
@@ -126,6 +132,7 @@ const MyComplaints = () => {
               "Resolved",
               "Rejected",
               "Success",
+              "In Progress",
             ]}
           />
           <FilterSelect

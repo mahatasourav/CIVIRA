@@ -1,6 +1,6 @@
 // Navbar component for citizen portal --> BY SOURAV MAHATA
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "@/assets/asset.js";
 import { FaRegPlusSquare, FaClipboardList } from "react-icons/fa";
@@ -21,8 +21,21 @@ const Navbar = () => {
   const [openProfile, setOpenProfile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const { isLoggedIn, setIsLoggedIn, logout, userData } = useAppContext();
+  const {
+    isLoggedIn,
+    setIsLoggedIn,
+    logout,
+    userData,
+    unreadCount,
+    fetchUnreadCount,
+  } = useAppContext();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchUnreadCount();
+    }
+  }, [isLoggedIn]);
 
   const navLinkClass = ({ isActive }) =>
     isActive
@@ -60,7 +73,17 @@ const Navbar = () => {
 
             {isLoggedIn && (
               <NavLink to="/notifications" className={navLinkClass}>
-                <IoMdNotifications /> Notifications
+                <div className="relative flex items-center gap-2">
+                  <IoMdNotifications className="text-xl" />
+
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-2 left-3 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+
+                  <span>Notifications</span>
+                </div>
               </NavLink>
             )}
 

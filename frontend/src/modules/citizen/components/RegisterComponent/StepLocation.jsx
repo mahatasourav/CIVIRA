@@ -272,7 +272,6 @@ const StepLocation = ({
             name="state"
             value={formData.state}
             onChange={onChange}
-            disabled={locationLocked}
             placeholder="State"
             className={`w-full bg-slate-50 border rounded-xl p-4 pr-12
         focus:ring-2 focus:ring-blue-500 outline-none ${
@@ -292,7 +291,6 @@ const StepLocation = ({
             name="city"
             value={formData.city}
             onChange={onChange}
-            disabled={locationLocked}
             placeholder="City"
             className={`w-full bg-slate-50 border rounded-xl p-4 pr-12
         focus:ring-2 focus:ring-blue-500 outline-none ${
@@ -312,7 +310,6 @@ const StepLocation = ({
             name="ward"
             value={formData.ward}
             onChange={onChange}
-            disabled={locationLocked}
             placeholder="Ward No."
             className={`w-full bg-slate-50 border rounded-xl p-4 pr-12
         focus:ring-2 focus:ring-blue-500 outline-none ${
@@ -326,13 +323,27 @@ const StepLocation = ({
         </div>
       </div>
 
+      {/* Ward No. */}
+      <div className="mb-6">
+        <input
+          type="number"
+          name="wardNumber"
+          value={formData.wardNumber}
+          onChange={onChange}
+          placeholder="Ward No."
+          className={`w-full bg-slate-50 border rounded-xl p-4 pr-12
+        focus:ring-2 focus:ring-blue-500 outline-none ${
+          errors.wardNumber ? "border-red-400 bg-red-50" : "border-slate-200"
+        }`}
+        />
+      </div>
+
       {/* Landmark */}
       <div className="mb-6">
         <input
           name="landmark"
           value={formData.landmark}
           onChange={onChange}
-          disabled={locationLocked}
           placeholder="Nearest Landmark (Optional)"
           className="w-full p-4 border bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
         />

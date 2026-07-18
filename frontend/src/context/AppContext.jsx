@@ -16,6 +16,7 @@ export const AppProvider = ({ children }) => {
   );
 
   const [userData, setUserData] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const [complaintsData, setComplaintsData] = useState([]);
   const [stats, setStats] = useState({
@@ -231,6 +232,28 @@ export const AppProvider = ({ children }) => {
     }
   }, [token]);
 
+  const fetchUnreadCount = async () => {
+    try {
+      const token = localStorage.getItem("CIVIRA_token");
+
+      console.log("Fetching unread count with token:", token);
+      const response = await axios.get(
+        `${API_BASE_URL}/api/notification/unread-count`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      console.log("Unread count response:", response);
+      if (response.data.success) {
+        setUnreadCount(response.data.count);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -258,6 +281,9 @@ export const AppProvider = ({ children }) => {
         setToken,
         setUser,
         getMyComplaints,
+        unreadCount,
+        setUnreadCount,
+        fetchUnreadCount,
       }}
     >
       {children}
