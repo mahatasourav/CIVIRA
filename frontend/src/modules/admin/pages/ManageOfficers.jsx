@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
+import { FaEdit, FaSearch, FaUserSlash, FaUserCheck } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const ManageOfficers = () => {
@@ -35,14 +35,19 @@ const ManageOfficers = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this officer?")) return;
+  const handleToggleStatus = async (id, currentStatus) => {
+    const action = currentStatus === "Active" ? "suspend" : "activate";
+
+    if (!window.confirm(`Are you sure you want to ${action} this officer?`)) {
+      return;
+    }
 
     try {
       const token = localStorage.getItem("adminToken");
 
-      const res = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/api/admin/officers/${id}`,
+      const res = await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/admin/officers/${id}/status`,
+        {},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -54,7 +59,7 @@ const ManageOfficers = () => {
 
       fetchOfficers();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Unable to delete officer");
+      toast.error(error.response?.data?.message || "Operation failed");
     }
   };
 
@@ -66,11 +71,11 @@ const ManageOfficers = () => {
         officer.officerId?.toLowerCase().includes(text) ||
         officer.city?.toLowerCase().includes(text) ||
         officer.state?.toLowerCase().includes(text) ||
-        officer.wardNo?.toString().includes(text)
+        officer.wardNo?.toString().includes(text) ||
+        officer.status?.toLowerCase().includes(text)
       );
     });
   }, [officers, search]);
-
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       {/* Header */}
@@ -100,6 +105,7 @@ const ManageOfficers = () => {
               <th className="px-6 py-4 text-left">Ward</th>
               <th className="px-6 py-4 text-left">City</th>
               <th className="px-6 py-4 text-left">State</th>
+              <th className="px-6 py-4 text-left">Status</th>
               <th className="px-6 py-4 text-left">Created</th>
               <th className="px-6 py-4 text-center">Actions</th>
             </tr>
@@ -108,7 +114,7 @@ const ManageOfficers = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="7" className="text-center py-10 text-gray-500">
+                <td colSpan="8" className="text-center py-10 text-gray-500">
                   Loading officers...
                 </td>
               </tr>
@@ -131,25 +137,55 @@ const ManageOfficers = () => {
 
                   <td className="px-6 py-4">{officer.state}</td>
 
+                  {/* Status */}
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-semibold text-white ${
+                        officer.status === "Active"
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      }`}
+                    >
+                      {officer.status}
+                    </span>
+                  </td>
+
                   <td className="px-6 py-4">
                     {new Date(officer.createdAt).toLocaleDateString()}
                   </td>
 
                   <td className="px-6 py-4">
                     <div className="flex justify-center gap-3">
+                      {/* Edit */}
                       <button
                         className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg"
-                        title="Edit"
+                        title="Edit Officer"
                       >
                         <FaEdit />
                       </button>
 
+                      {/* Suspend / Activate */}
                       <button
-                        onClick={() => handleDelete(officer._id)}
-                        className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg"
-                        title="Delete"
+                        onClick={() =>
+                          handleToggleStatus(officer._id, officer.status)
+                        }
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-white transition ${
+                          officer.status === "Active"
+                            ? "bg-red-500 hover:bg-red-600"
+                            : "bg-green-500 hover:bg-green-600"
+                        }`}
                       >
-                        <FaTrash />
+                        {officer.status === "Active" ? (
+                          <>
+                            <FaUserSlash />
+                            Suspend
+                          </>
+                        ) : (
+                          <>
+                            <FaUserCheck />
+                            Activate
+                          </>
+                        )}
                       </button>
                     </div>
                   </td>
@@ -157,7 +193,7 @@ const ManageOfficers = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center py-10 text-gray-500">
+                <td colSpan="8" className="text-center py-10 text-gray-500">
                   No officers found.
                 </td>
               </tr>

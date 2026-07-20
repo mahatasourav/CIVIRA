@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const RegisterComplaintContext = createContext();
 
@@ -18,6 +19,7 @@ export const AppProvider2 = ({ children }) => {
   const [validImages, setValidImages] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const navigate = useNavigate();
   /* ---------- Global State ---------- */
 
   const [formData, setFormData] = useState({
