@@ -40,6 +40,7 @@ import VerifyOTP from "@/modules/admin/pages/VerifyOTP";
 import Complaint from "@/modules/officer/pages/Complaint";
 import OfficerProfile from "@/modules/officer/pages/OfficerProfile";
 import ComplaintDetailsOfficer from "@/modules/officer/pages/ComplaintDetailsOfficer";
+import AdminNotifications from "@/modules/admin/pages/AdminNotifications";
 
 const App = () => {
   return (
@@ -151,6 +152,7 @@ const App = () => {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="create-officer" element={<CreateOfficer />} />
           <Route path="manage-officers" element={<ManageOfficers />} />
+          <Route path="notifications" element={<AdminNotifications />} />
         </Route>
         {/* 404 */}
         <Route path="*" element={<NotFound />} />

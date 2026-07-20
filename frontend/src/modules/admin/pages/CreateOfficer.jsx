@@ -3,21 +3,53 @@ import axios from "axios";
 import { FaUserPlus } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { State, City } from "country-state-city";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const CreateOfficer = () => {
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [wardAvailable, setWardAvailable] = useState(null);
+  const [searchParams] = useSearchParams();
+
+  const state = searchParams.get("state");
+  const city = searchParams.get("city");
+  const ward = searchParams.get("ward");
+  const fromNotification = searchParams.get("fromNotification") === "true";
+  const navigate = useNavigate();
+
+  console.log(state, city, ward);
 
   const [formData, setFormData] = useState({
-    state: "",
-    city: "",
-    wardNo: "",
+    state: searchParams.get("state") || "",
+    city: searchParams.get("city") || "",
+    wardNo: searchParams.get("ward") || "",
+    // other fields...
   });
 
   useEffect(() => {
-    setStates(State.getStatesOfCountry("IN"));
-  }, []);
+    const allStates = State.getStatesOfCountry("IN");
+    setStates(allStates);
+
+    if (state) {
+      const selectedState = allStates.find((s) => s.name === state);
+
+      if (selectedState) {
+        setCities(City.getCitiesOfState("IN", selectedState.isoCode));
+
+        setFormData((prev) => ({
+          ...prev,
+          state: selectedState.name,
+          city: city || "",
+          wardNo: ward || "",
+        }));
+
+        // Skip ward checking if coming from notification
+        if (fromNotification) {
+          setWardAvailable(true);
+        }
+      }
+    }
+  }, [state, city, ward, fromNotification]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,11 +59,12 @@ const CreateOfficer = () => {
 
       setCities(City.getCitiesOfState("IN", value));
 
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         state: selectedState.name,
         city: "",
         wardNo: "",
-      });
+      }));
 
       setWardAvailable(null);
 
@@ -102,7 +135,7 @@ const CreateOfficer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!wardAvailable) {
+    if (!fromNotification && !wardAvailable) {
       toast.error("Please select an available ward.");
       return;
     }
@@ -136,6 +169,7 @@ Password   : ${res.data.password}
       });
 
       setCities([]);
+      navigate("/admin/manage-officers");
     } catch (error) {
       toast.error(error.response?.data?.message);
     }
@@ -159,6 +193,7 @@ Password   : ${res.data.password}
                 states.find((s) => s.name === formData.state)?.isoCode || ""
               }
               onChange={handleChange}
+              disabled={fromNotification}
               className="w-full mt-2 border rounded-lg p-3"
               required
             >
@@ -179,7 +214,7 @@ Password   : ${res.data.password}
               name="city"
               value={formData.city}
               onChange={handleChange}
-              disabled={!cities.length}
+              disabled={fromNotification || !cities.length}
               className="w-full mt-2 border rounded-lg p-3"
               required
             >
@@ -202,7 +237,8 @@ Password   : ${res.data.password}
               name="wardNo"
               value={formData.wardNo}
               onChange={handleChange}
-              onBlur={checkWard}
+              onBlur={!fromNotification ? checkWard : undefined}
+              disabled={fromNotification}
               placeholder="Enter Ward Number"
               className="w-full mt-2 border rounded-lg p-3"
               required
@@ -222,7 +258,7 @@ Password   : ${res.data.password}
 
           <button
             type="submit"
-            disabled={!wardAvailable}
+            disabled={!fromNotification && !wardAvailable}
             className={`w-full py-3 rounded-lg text-white font-semibold ${
               wardAvailable
                 ? "bg-primary hover:bg-primary-dark transition"

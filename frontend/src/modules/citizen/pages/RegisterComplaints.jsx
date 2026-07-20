@@ -59,6 +59,8 @@ const RegisterComplaints = () => {
     setIsLoading,
   } = useRegisterComplaintContext();
 
+  console.log("Current step:", step);
+  console.log("validImagesssssssssssssssss:", validImages);
   // useState hooks can be added here ...
 
   /* ---------- Handlers ---------- */

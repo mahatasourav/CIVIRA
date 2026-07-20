@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaUsers,
   FaUserPlus,
@@ -6,34 +6,78 @@ import {
   FaChartLine,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Dashboard = () => {
+  const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchDashboard = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/admin/dashboard`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (data.success) {
+        setDashboard(data.data);
+      }
+    } catch (error) {
+      console.log(error);
+
+      toast.error(
+        error.response?.data?.message || "Failed to fetch dashboard data.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+
   const stats = [
     {
       title: "Total Officers",
-      value: 12,
+      value: dashboard?.officers?.total || 0,
       icon: <FaUsers size={28} />,
       color: "bg-blue-500",
     },
     {
       title: "Total Complaints",
-      value: 248,
+      value: dashboard?.complaints?.total || 0,
       icon: <FaClipboardList size={28} />,
       color: "bg-green-500",
     },
     {
       title: "Pending Complaints",
-      value: 37,
+      value: dashboard?.complaints?.pending || 0,
       icon: <FaChartLine size={28} />,
       color: "bg-yellow-500",
     },
     {
       title: "Resolved Complaints",
-      value: 211,
+      value: dashboard?.complaints?.resolved || 0,
       icon: <FaClipboardList size={28} />,
       color: "bg-purple-500",
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-lg font-semibold">
+        Loading Dashboard...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -97,18 +141,68 @@ const Dashboard = () => {
             <div>
               <h2 className="font-bold text-xl">Manage Officers</h2>
 
-              <p className="text-gray-500">View, edit and remove officers.</p>
+              <p className="text-gray-500">View, edit and manage officers.</p>
             </div>
           </div>
         </Link>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-2xl font-bold mb-4">Recent Activity</h2>
+      {/* Officer Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <p className="text-gray-500">Active Officers</p>
+          <h2 className="text-3xl font-bold text-green-600 mt-2">
+            {dashboard?.officers?.active || 0}
+          </h2>
+        </div>
 
-        <div className="text-gray-500 text-center py-12">
-          No recent activity available.
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <p className="text-gray-500">Suspended Officers</p>
+          <h2 className="text-3xl font-bold text-red-600 mt-2">
+            {dashboard?.officers?.suspended || 0}
+          </h2>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <p className="text-gray-500">Waiting for Officer</p>
+          <h2 className="text-3xl font-bold text-orange-500 mt-2">
+            {dashboard?.complaints?.waitingForOfficer || 0}
+          </h2>
+        </div>
+      </div>
+
+      {/* Complaint Summary */}
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <h2 className="text-2xl font-bold mb-6">Complaint Overview</h2>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="text-center">
+            <p className="text-gray-500">Pending</p>
+            <h3 className="text-2xl font-bold text-yellow-500">
+              {dashboard?.complaints?.pending || 0}
+            </h3>
+          </div>
+
+          <div className="text-center">
+            <p className="text-gray-500">In Progress</p>
+            <h3 className="text-2xl font-bold text-blue-500">
+              {dashboard?.complaints?.inProgress || 0}
+            </h3>
+          </div>
+
+          <div className="text-center">
+            <p className="text-gray-500">Resolved</p>
+            <h3 className="text-2xl font-bold text-green-600">
+              {dashboard?.complaints?.resolved || 0}
+            </h3>
+          </div>
+
+          <div className="text-center">
+            <p className="text-gray-500">Waiting Officer</p>
+            <h3 className="text-2xl font-bold text-red-500">
+              {dashboard?.complaints?.waitingForOfficer || 0}
+            </h3>
+          </div>
         </div>
       </div>
     </div>
